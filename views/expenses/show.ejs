@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <% const getTotal = (c) => {
+       let total = 0;
+       if(c === 'bills') {
+           for(bill of bills) {
+               total = total + bill.amount;
+           } 
+        } else {
+               for(expense of week) {
+                   if (expense.category === c) {
+                       total = total + expense.amount
+                   }
+               }
+        }
+           return total  
+    } %>  
+
+    <style type="text/css">
+      body { background: grey !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+    </style>
+</head>
+<body class="bootstrap-dark">
+    <div class="container">
+        <div class="row">
+
+          <div class="col">
+            <div class="card">
+                <h5 class="card-header">Bills</h5>
+                <div class="card-body">
+                  <p class="card-text"> 
+                   <% for(expense of bills) { %>
+                    <li>  <%= expense.name%> - $<%= expense.amount %>  </li> 
+                    <% } %> 
+                  </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Total p/w = $<%= getTotal('bills') %>  </li>  
+                </ul>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+                <h5 class="card-header">Chart</h5>
+                <div class="card-body">
+                  <p class="card-text"> 
+                    <!--Div that will hold the pie chart-->
+                    <div id="chart_div"></div>
+                  </p>
+                </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+                <h5 class="card-header">Groceries</h5>
+                <div class="card-body">
+                  <p class="card-text"> 
+                    <% for(expense of week) { %>
+                        <% if(expense.category === 'groceries') {%>
+                            <li> <%=  expense.amount %>  </li> 
+                        <% } %> 
+                    <% } %> 
+                  </p>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Spent = $<%= getTotal('groceries') %>  </li>
+                    <li class="list-group-item">Remaining budget = $<%= categoryBudgets.groceries - getTotal('groceries')%> </li>
+                    <li class="list-group-item">Average Spent Per Week = 
+                      <% let total = 0; %>
+                      <% for(expense of expenses) { %>
+                        
+                        <% if(expense.category === 'groceries') { %>
+                          <% total = total + expense.amount %>
+                        <% } %>
+                        
+                      <% } %> 
+                      <%= total/6; %>
+                      </li>
+                </ul>
+                </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+                <h5 class="card-header">Household</h5>
+                <div class="card-body">
+                  <p class="card-text"> 
+                    <% for(expense of week) { %>
+                        <% if(expense.category === 'household') {%>
+                            <li> <%=  expense.amount %>  </li> 
+                        <% } %> 
+                    <% } %> 
+                  </p>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Spent = $<%= getTotal('household') %>  </li>
+                    <li class="list-group-item">Remaining budget = $<%= categoryBudgets.household - getTotal('groceries')%> </li>
+                </ul>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="card">
+                <h5 class="card-header">Personal</h5>
+                <div class="card-body">
+                  <p class="card-text"> 
+                    <% for(expense of week) { %>
+                        <% if(expense.category === 'personal') {%>
+                            <li> <%=  expense.amount %>  </li> 
+                        <% } %> 
+                    <% } %> 
+                  </p>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Spent = $<%= getTotal('personal') %>  </li>
+                    <li class="list-group-item">Remaining budget = $<%= categoryBudgets.personal - getTotal('groceries')%> </li>
+                </ul>
+                </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+                <h5 class="card-header">Leisure</h5>
+                <div class="card-body">
+                  <p class="card-text"> 
+                    <% for(expense of week) { %>
+                        <% if(expense.category === 'leisure') {%>
+                            <li> <%=  expense.amount %>  </li> 
+                        <% } %> 
+                    <% } %> 
+                  </p>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Spent = $<%= getTotal('leisure') %>  </li>
+                    <li class="list-group-item">Remaining budget = $<%= categoryBudgets.leisure - getTotal('groceries')%> </li>
+                </ul>
+                </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+                <form action="/expenses" method="POST">
+                    <section>
+                        <label for="amount">Amount:</label>
+                        <input type="number" id="amount" placeholder="0" name="amount">
+                    </section>
+                    <section>
+                        <label for="category">Category</label>
+                       <select name="category" id="category">
+                           <option value="groceries">Groceries</option>
+                           <option value="household">Household</option>
+                           <option value="personal">Personal</option>
+                           <option value="leisure">Leisure</option>
+                       </select>
+                    </section>
+                    <button>Submit</button>
+                </form>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+    
+</body>
+</html>
